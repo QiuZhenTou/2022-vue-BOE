@@ -253,6 +253,7 @@
 import { fetchList, createArticle, updateArticle } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import { forEach } from "mock/user";
 
 export default {
   name: "Equipment-GroupList",
@@ -266,6 +267,22 @@ export default {
       dataList: [
         {
           groupID: "1",
+          groupName: "分组1",
+          agency: "机构1",
+          equNum: "1",
+          describe: "没有描述",
+          equName: "设备1",
+        },
+        {
+          groupID: "2",
+          groupName: "分组1",
+          agency: "机构1",
+          equNum: "1",
+          describe: "没有描述",
+          equName: "设备1",
+        },
+        {
+          groupID: "3",
           groupName: "分组1",
           agency: "机构1",
           equNum: "1",
@@ -370,9 +387,9 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+      // this.$nextTick(() => {
+      //   this.$refs["dataForm"].clearValidate();
+      // });
     },
     resetTemp() {
       this.temp = {
@@ -401,28 +418,26 @@ export default {
     // 按钮 删除
     handleDelete(row, index) {
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
+        title: "删除成功",
+        message: "已删除数据",
         type: "success",
         duration: 2000,
       });
-      this.list.splice(index, 1);
+      this.dataList.splice(index, 1);
     },
     // 对话框 按钮 保存
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
+          // this.temp.groupID = this.getMaxGroupID(this.dataList);
+          // console.log(this.getMaxGroupID(this.dataList));
+          this.dataList.unshift(this.temp);
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "Success",
+            message: "创建成功",
+            type: "success",
+            duration: 2000,
           });
         }
       });
@@ -446,6 +461,13 @@ export default {
         }
       });
     },
+    // getMaxGroupID(dataList) {
+    //   var max = 0;
+    //   for (var data in dataList) {
+    //     if (data.groupID > max) max = data.groupID;
+    //   }
+    //   return max;
+    // },
     // 表格 排序功能
     sortChange(data) {
       const { prop, order } = data;
