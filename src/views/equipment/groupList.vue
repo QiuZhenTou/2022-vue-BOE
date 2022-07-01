@@ -253,7 +253,6 @@
 import { fetchList, createArticle, updateArticle } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import { forEach } from "mock/user";
 
 export default {
   name: "Equipment-GroupList",
