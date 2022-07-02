@@ -4,41 +4,21 @@
     <div class="filter-container">
       <!-- 第一行 -->
       <el-row type="flex" justify="space-between">
-        <!-- 输入框 分组名称 -->
+        <!-- 下拉框 公告状态 -->
         <el-col :span="10">
           <el-col :span="6">
-            <div style="line-height: 40px">分组名称:</div>
-          </el-col>
-          <el-col :span="18">
-            <el-input
-              v-model="queryList.groupName"
-              placeholder="请输入分组名称"
-              style="width: 210px"
-              class="filter-item"
-              @keyup.enter.native="handleFilter"
-            />
-            <el-button
-              class="my-icon-button"
-              icon="el-icon-search"
-              @click="handleFilter"
-            />
-          </el-col>
-        </el-col>
-        <!-- 下拉框 所属机构 -->
-        <el-col :span="10">
-          <el-col :span="6">
-            <div style="line-height: 40px">所属机构:</div>
+            <div style="line-height: 40px">公告状态:</div>
           </el-col>
           <el-col :span="18">
             <el-select
-              v-model="queryList.agency"
-              placeholder="请选择所属机构"
+              v-model="queryList.noticeStatus"
+              placeholder="请选择公告状态"
               clearable
               style="width: 250px"
               class="filter-item"
             >
               <el-option
-                v-for="item in agencyList"
+                v-for="item in noticeStatusList"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -72,8 +52,19 @@
     <!-- 功能栏 -->
     <div class="function-button-container">
       <el-row type="flex" justify="end">
-        <el-col :span="4">
-          <!-- 按钮 新建分组 -->
+        <el-col :span="7">
+          <!-- 按钮 批量删除 -->
+          <el-button
+            v-waves
+            disabled
+            class="filter-item"
+            type="primary"
+            icon="el-icon-delete"
+            @click="handleCreate"
+          >
+            批量删除
+          </el-button>
+          <!-- 按钮 创建公告 -->
           <el-button
             v-waves
             class="filter-item"
@@ -81,7 +72,7 @@
             icon="el-icon-edit-outline"
             @click="handleCreate"
           >
-            新建分组
+            创建公告
           </el-button>
         </el-col>
       </el-row>
@@ -97,52 +88,37 @@
       @sort-change="sortChange"
       class="table table-container"
     >
-      <!-- 复选框 -->
       <el-table-column type="selection" width="25px" />
-      <!-- 分组ID -->
-      <el-table-column
-        label="分组ID"
-        prop="groupID"
-        align="center"
-        width="150px"
-        :class-name="getSortClass('groupID')"
-      >
+      <el-table-column label="公告内容" width="200px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.groupID }}</span>
+          <span>{{ row.noticeText }}</span>
         </template>
       </el-table-column>
-      <!-- 分组名称 -->
-      <el-table-column label="分组名称" width="200px" align="center">
+      <el-table-column label="播放时间" width="200px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.groupName }}</span>
+          <span>{{ row.playTime }}</span>
         </template>
       </el-table-column>
-      <!-- 所属机构 -->
-      <el-table-column label="所属机构" width="200px" align="center">
+      <el-table-column label="公告状态" width="150px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.agency }}</span>
+          <span>{{ row.noticeStatus }}</span>
         </template>
       </el-table-column>
-      <!-- 设备数量 -->
-      <el-table-column label="设备数量" width="100px" align="center">
+      <el-table-column label="作者" width="150px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.equNum }}</span>
+          <span>{{ row.author }}</span>
         </template>
       </el-table-column>
-      <!-- 描述 -->
-      <el-table-column label="描述" width="250px" align="center">
+      <el-table-column label="创建时间" width="200px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.describe }}</span>
+          <span>{{ row.createdTime }}</span>
         </template>
       </el-table-column>
-      <!-- 操作 -->
       <el-table-column label="操作" width="250px" align="center">
         <template slot-scope="{ row, $index }">
-          <!-- 详情 -->
           <el-button type="info" size="mini" @click="handleMoreInfo(row)">
             详情
           </el-button>
-          <!-- 编辑 -->
           <el-button
             type="warning"
             size="mini"
@@ -150,7 +126,6 @@
           >
             编辑
           </el-button>
-          <!-- 删除 -->
           <el-button type="danger" size="mini" @click="handleDelete($index)">
             删除
           </el-button>
@@ -180,11 +155,9 @@
         label-width="90px"
         style="width: 400px; margin-left: 50px"
       >
-        <!-- 分组名称 -->
         <el-form-item label="分组名称:" prop="groupName">
           <el-input v-model="temp.groupName" placeholder="请输入分组名称" />
         </el-form-item>
-        <!-- 所属机构 -->
         <el-form-item label="所属机构:" prop="agency">
           <el-select
             v-model="temp.agency"
@@ -192,18 +165,16 @@
             placeholder="请选择所属机构"
           >
             <el-option
-              v-for="item in agencyList"
+              v-for="item in noticeStatusList"
               :key="item"
               :label="item"
               :value="item"
             />
           </el-select>
         </el-form-item>
-        <!-- 描述 -->
         <el-form-item label="描述:" prop="describe">
           <el-input v-model="temp.describe" placeholder="描述最多200字" />
         </el-form-item>
-        <!-- 设备选择 -->
         <el-form-item label="设备选择:" prop="equName">
           <el-select
             multiple
@@ -220,7 +191,6 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <!-- 表尾 -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> 取消 </el-button>
         <el-button
@@ -245,24 +215,19 @@
         label-width="90px"
         style="width: 400px; margin-left: 50px"
       >
-      <!-- 分组名称 -->
         <el-form-item label="分组名称:">
           {{ temp.groupName }}
         </el-form-item>
-        <!-- 所属机构 -->
         <el-form-item label="所属机构:">
           {{ temp.agency }}
         </el-form-item>
-        <!-- 描述 -->
         <el-form-item label="描述:">
           {{ temp.describe }}
         </el-form-item>
-        <!-- 设备选择 -->
         <el-form-item label="设备选择:">
           <li v-for="item in temp.equName" :key="item">{{ item }}</li>
         </el-form-item>
       </el-form>
-      <!-- 表尾 -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogTableVisible = false"> 返回 </el-button>
       </div>
@@ -271,6 +236,7 @@
 </template>
 
 <script>
+import { fetchList, createArticle, updateArticle } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
@@ -285,40 +251,44 @@ export default {
       // 表格 显示的数据
       dataList: [
         {
-          groupID: 1,
-          groupName: "分组1",
-          agency: "机构1",
-          equNum: "1",
-          describe: "没有描述",
-          equName: ["设备1"],
+          noticeStatus: "发布中",
+          noticeText: "test",
+          playTime: "2022-07-01 11:24:19",
+          author: "qqr",
+          createdTime: "2022-07-01 14:17:19",
         },
         {
-          groupID: 2,
-          groupName: "分组1",
-          agency: "机构1",
-          equNum: "1",
-          describe: "没有描述",
-          equName: ["设备1"],
+          noticeStatus: "发布中",
+          noticeText: "test",
+          playTime: "2022-07-01 11:24:19",
+          author: "qqr",
+          createdTime: "2022-07-01 14:17:19",
         },
         {
-          groupID: 3,
-          groupName: "分组1",
-          agency: "机构1",
-          equNum: "1",
-          describe: "没有描述",
-          equName: ["设备1"],
+          noticeStatus: "发布中",
+          noticeText: "test",
+          playTime: "2022-07-01 11:24:19",
+          author: "qqr",
+          createdTime: "2022-07-01 14:17:19",
         },
       ],
       /*--------------------------------------------*/
       // 下拉框 选项
-      agencyList: ["机构1", "机构2", "机构3"],
+      noticeStatusList: [
+        "全部",
+        "待发布",
+        "发布中",
+        "播放中",
+        "部分成功",
+        "发布失败",
+        "已失败",
+      ],
       equNameList: ["设备1", "设备2", "设备3"],
       // 筛选栏 绑定的数据
       queryList: {
         page: 1,
         limit: 20,
-        groupName: "",
-        agency: "",
+        noticeStatus: "全部",
       },
       // 对话框 绑定的临时数据
       temp: {
@@ -378,23 +348,22 @@ export default {
     // 获得数据
     getList() {
       this.listLoading = true;
-      // fetchList(this.queryList).then((response) => {
-      //   this.list = response.data.items;
-      //   this.total = response.data.total;
+      fetchList(this.queryList).then((response) => {
+        this.list = response.data.items;
+        this.total = response.data.total;
 
-      //   // 模拟请求的时间
-      //   setTimeout(() => {
-      //     this.listLoading = false;
-      //   }, 1.5 * 1000);
-      // });
+        // 模拟请求的时间
+        setTimeout(() => {
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     // 按钮 重置
     handleReset() {
       this.queryList = {
         page: 1,
         limit: 20,
-        planName: "",
-        planStatus: "",
+        noticeStatus: "",
       };
     },
     // 按钮 查询
@@ -404,12 +373,7 @@ export default {
     },
     // 按钮 新建分组
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+      this.$router.push("/program/noticeList/new");
     },
     resetTemp() {
       this.temp = {
@@ -429,7 +393,7 @@ export default {
     handleUpdate(row, index) {
       this.updateDataIndex = index;
       this.temp = Object.assign({}, row); // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp);
+      this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -455,7 +419,7 @@ export default {
           this.dataList.unshift(this.temp); // 在表头添加数据
           this.dialogFormVisible = false;
           this.$notify({
-            title: "创建成功",
+            title: "Success",
             message: "创建成功",
             type: "success",
             duration: 2000,

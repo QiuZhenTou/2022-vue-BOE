@@ -1,19 +1,19 @@
 <template>
-  <div class="app-container">
+  <div class="view-container">
     <!-- 筛选栏 -->
-    <div class="filter-container my-container">
+    <div class="filter-container">
       <!-- 第一行 -->
       <el-row :align="middle">
         <el-col :span="8">
+          <!-- 输入框 账户名 -->
           <el-col :span="6">
-            <div style="line-height: 40px">设备名称:</div>
+            <div style="line-height: 40px">账户名:</div>
           </el-col>
-          <!-- 输入框 -->
           <el-col :span="18">
             <el-input
-              v-model="listQuery.groupName"
-              placeholder="请输入设备名称"
-              style="width: 160px"
+              v-model="queryList.account"
+              placeholder="请输入账户名"
+              style="width: 200px"
               class="filter-item"
               @keyup.enter.native="handleFilter"
             />
@@ -21,20 +21,20 @@
           </el-col>
         </el-col>
         <el-col :span="8">
+          <!-- 下拉框 所属机构 -->
           <el-col :span="6">
             <div style="line-height: 40px">所属机构:</div>
           </el-col>
-          <!-- 下拉框 -->
           <el-col :span="18">
             <el-select
-              v-model="listQuery.group"
+              v-model="queryList.agency"
               placeholder="请选择所属机构"
               clearable
-              style="width: 200px"
+              style="width: 240px"
               class="filter-item"
             >
               <el-option
-                v-for="item in importanceOptions"
+                v-for="item in agencyList"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -43,20 +43,20 @@
           </el-col>
         </el-col>
         <el-col :span="8">
+          <!-- 下拉框 状态 -->
           <el-col el-col :span="6">
-            <div style="line-height: 40px">所属分组:</div>
+            <div style="line-height: 40px">状态:</div>
           </el-col>
-          <!-- 下拉框 -->
           <el-col :span="18">
             <el-select
-              v-model="listQuery.group"
-              placeholder="请选择所属分组"
+              v-model="queryList.accountStatus"
+              placeholder="请选择状态"
               clearable
-              style="width: 200px"
+              style="width: 240px"
               class="filter-item"
             >
               <el-option
-                v-for="item in importanceOptions"
+                v-for="item in accountStatusList"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -66,31 +66,13 @@
         </el-col>
       </el-row>
       <!-- 第二行 -->
-      <el-row type="flex">
-        <el-col :span="8">
-          <el-col el-col :span="6">
-            <div style="line-height: 40px">MAC地址:</div>
-          </el-col>
-          <!-- 输入框 -->
-          <el-col :span="18">
-            <el-input
-              v-model="listQuery.groupName"
-              placeholder="请输入MAC地址"
-              style="width: 160px"
-              class="filter-item"
-              @keyup.enter.native="handleFilter"
-            />
-            <el-button class="my-icon-button" icon="el-icon-search" />
-          </el-col>
-        </el-col>
-        <el-col :span="2.5">
+      <el-row type="flex" class="row-bg" justify="end">
+        <el-col :span="5" :offset="19">
           <!-- 重置按钮 -->
           <el-button
             class="filter-item"
-            style="margin-left: 10px"
-            type="primary"
             icon="el-icon-refresh"
-            @click="handleFilter"
+            @click="handleReset"
           >
             重置
           </el-button>
@@ -108,132 +90,101 @@
       </el-row>
     </div>
 
-    <div class="new-group my-container">
+    <!-- 功能栏 -->
+    <div class="function-button-container">
       <el-row type="flex" justify="end">
-        <el-col :span="2.5">
+        <el-col :span="4">
           <div class="new-group">
             <!-- 新建分组按钮 -->
             <el-button
               v-waves
               class="filter-item"
               type="primary"
-              icon="el-icon-document-copy"
-              @click="handleMoreInfo"
-            >
-              批量导入
-            </el-button>
-            <el-button
-              v-waves
-              class="filter-item"
-              type="primary"
-              icon="el-icon-download"
+              icon="el-icon-edit-outline"
               @click="handleCreate"
             >
-              模板下载
-            </el-button>
-            <el-button
-              v-waves
-              class="filter-item"
-              type="primary"
-              icon="el-icon-delete"
-              @click="handleCreate"
-            >
-              批量删除
-            </el-button>
-            <el-button
-              v-waves
-              class="filter-item"
-              type="primary"
-              icon="el-icon-connection"
-              @click="handleCreate"
-            >
-              批量控制
-            </el-button>
-            <el-button
-              v-waves
-              class="filter-item"
-              type="primary"
-              icon="el-icon-upload2"
-              @click="handleCreate"
-            >
-              数据导出
+              新建账户
             </el-button>
           </div>
         </el-col>
       </el-row>
     </div>
 
-    <!-- 表单 v-loading="listLoading" -->
+    <!-- 表格 -->
     <el-table
       :key="tableKey"
-      :data="listData"
+      :data="dataList"
       fit
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      class="table table-container"
     >
-      <el-table-column type="selection" width="25px" />
-      <el-table-column
-        label="设备名称"
-        prop="id"
-        align="center"
-        width="120px"
-        :class-name="getSortClass('id')"
-      >
+      <!-- 账户名 -->
+      <el-table-column label="账户名" width="100px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
+          <span>{{ row.accountName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所属机构" width="120px" align="center">
+      <!-- 所属机构 -->
+      <el-table-column label="所属机构" width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.group }}</span>
+          <span>{{ row.agency }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所属分组" width="120px" align="center">
+      <!-- 所属角色 -->
+      <el-table-column label="所属角色" width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.role }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="MAC地址" width="150px" align="center">
+      <!-- 状态 -->
+      <el-table-column label="状态" width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.accountStatus }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="分辨率" width="150px" align="center">
+      <!-- 真实姓名 -->
+      <el-table-column label="真实姓名" width="120px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.userRealName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="设备状态" width="120px" align="center">
+      <!-- 手机号 -->
+      <el-table-column label="手机号" width="120px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.phoneNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="系统升级" width="120px" align="center">
+      <!-- 邮箱 -->
+      <el-table-column label="邮箱" width="180px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.emailAddr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="当前计划" width="120px" align="center">
+      <!-- 更新时间 -->
+      <el-table-column label="更新时间" width="160px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.updateTime }}</span>
         </template>
       </el-table-column>
+      <!-- 操作 -->
       <el-table-column label="操作" align="center">
         <template slot-scope="{ row, $index }">
+          <!-- 停用 -->
           <el-button
-            type="info"
+            type="danger"
+            plain
             size="mini"
-            @click="handleModifyStatus(row, 'draft')"
+            @click="handleChangeStatus(row)"
           >
-            详情
+            停用
           </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
-            刷新
-          </el-button>
+          <!-- 编辑 -->
           <el-button type="warning" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
+          <!-- 删除 -->
           <el-button
             type="danger"
             size="mini"
@@ -249,16 +200,17 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="queryList.page"
+      :limit.sync="queryList.limit"
       @pagination="getList"
     />
 
-    <!-- 添加 对话框 -->
+    <!-- 对话框 添加账户/编辑账户-->
     <el-dialog
-      :title="textMap[dialogStatus]"
+      :title="dialogTitleMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       width="30%"
+      top="10px"
     >
       <el-form
         ref="dataForm"
@@ -268,24 +220,73 @@
         label-width="90px"
         style="width: 300px; margin-left: 50px"
       >
-        <el-form-item label="设备名称" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入设备名称" />
+      <!-- 账户名 -->
+        <el-form-item label="账户名" prop="groupName">
+          <el-input v-model="temp.groupName" placeholder="请输入账户名" />
         </el-form-item>
-        <el-form-item label="所属分组" prop="group">
+        <!-- 密码 -->
+        <el-form-item label="密码" prop="groupName">
+          <el-input v-model="temp.groupName" placeholder="请输入密码" />
+        </el-form-item>
+        <!-- 所属机构 -->
+        <el-form-item label="所属机构" prop="group">
           <el-select
             v-model="temp.group"
             class="filter-item"
-            placeholder="请选择所属分组"
+            placeholder="请选择所属机构"
           >
             <el-option
-              v-for="item in calendarTypeOptions"
+              v-for="item in groupList"
               :key="item.key"
               :label="item.display_name"
               :value="item.key"
             />
           </el-select>
         </el-form-item>
+        <!-- 所属角色 -->
+        <el-form-item label="所属角色" prop="group">
+          <el-select
+            v-model="temp.group"
+            class="filter-item"
+            placeholder="请选择所属角色"
+          >
+            <el-option
+              v-for="item in groupList"
+              :key="item.key"
+              :label="item.display_name"
+              :value="item.key"
+            />
+          </el-select>
+        </el-form-item>
+        <!-- 账户状态 -->
+        <el-form-item label="账户状态" prop="group">
+          <el-select
+            v-model="temp.group"
+            class="filter-item"
+            placeholder="请选择账户状态"
+          >
+            <el-option
+              v-for="item in groupList"
+              :key="item.key"
+              :label="item.display_name"
+              :value="item.key"
+            />
+          </el-select>
+        </el-form-item>
+        <!-- 真实姓名 -->
+        <el-form-item label="真实姓名" prop="groupName">
+          <el-input v-model="temp.groupName" placeholder="请输入真实姓名" />
+        </el-form-item>
+        <!-- 邮箱 -->
+        <el-form-item label="邮箱" prop="groupName">
+          <el-input v-model="temp.groupName" placeholder="请输入邮箱" />
+        </el-form-item>
+        <!-- 手机号 -->
+        <el-form-item label="密码" prop="groupName">
+          <el-input v-model="temp.groupName" placeholder="请输入手机号" />
+        </el-form-item>
       </el-form>
+      <!-- 表尾 -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> 取消 </el-button>
         <el-button
@@ -296,324 +297,250 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogTableVisible" width="40%" title="设备详情">
-      <template>
-        <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-          <el-tab-pane label="设备信息" name="first">
-            <!-- 第一行 -->
-            <el-row>
-              <el-col :span="12">
-                <el-col :span="6"> 设备型号: </el-col>
-                <el-col :span="18"> HiDPTAndroid Hi3751V553 </el-col>
-              </el-col>
-              <el-col :span="12">
-                <el-col :span="6"> 系统版本: </el-col>
-                <el-col :span="18"> BOE_iGallery32_V13103_V5.2.0 </el-col>
-              </el-col>
-            </el-row>
-            <!-- 第二行 -->
-            <el-row>
-              <el-col :span="12">
-                <el-col :span="6"> </el-col>
-                <el-col :span="18"> </el-col>
-              </el-col>
-              <el-col :span="12">
-                <el-col :span="6"> </el-col>
-                <el-col :span="18"> </el-col>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-          <el-tab-pane label="安装信息" name="second">
-            <!-- 第一行 -->
-            <el-row>
-              <el-col :span="12">
-                <el-col :span="6"> 设备名称: </el-col>
-                <el-col :span="18"> test </el-col>
-              </el-col>
-              <el-col :span="12">
-                <el-col :span="6"> 注册时间: </el-col>
-                <el-col :span="18"> 2022-06-27 14:31:14 </el-col>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-          <el-tab-pane label="状态信息" name="third">
-            <!-- 第一行 -->
-            <el-row>
-              <el-col :span="12">
-                <el-col :span="6"> 设备状态: </el-col>
-                <el-col :span="18"> 离线 </el-col>
-              </el-col>
-              <el-col :span="12">
-                <el-col :span="6"> 当前计划: </el-col>
-                <el-col :span="18"> -- </el-col>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-        </el-tabs>
-      </template>
-      <!-- <el-table :data="pvData" border fit highlight-current-row style="width: 75%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table> -->
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogTableVisible = false"
-          >返回</el-button
-        >
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, createArticle, updateArticle } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import waves from "@/directive/waves"; // waves directive
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 // import InputSearch from '@/components/InputSearch'
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
-  name: 'ComplexTable',
+  name: "Equipment-GroupList",
   components: {
-    Pagination
-    // InputSearch
+    Pagination,
   },
   directives: { waves },
-  filters: {
-    statusFilter (status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter (type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
-  data () {
+  data() {
     return {
-      activeName: 'first',
-      tableKey: 0,
-      listData: [{}],
-      total: 0,
-      listLoading: true,
-      listQuery: {
+      // 表格 显示的数据
+      dataList: [
+        {
+          accountName: "test",
+          agency: "机构1",
+          role: "无",
+          userRealName: "qqr",
+          phoneNum: 61584220941,
+          emailAddr: "61584220941@163.com",
+          updateTime: "	2022-06-27 09:17:25",
+        },
+        {
+          accountName: "tester",
+          agency: "机构2",
+          role: "无",
+          userRealName: "qqr",
+          phoneNum: 61584220941,
+          emailAddr: "61584220941@163.com",
+          updateTime: "	2022-06-27 09:17:25",
+        },
+        {
+          accountName: "test-man",
+          agency: "机构3",
+          role: "无",
+          userRealName: "qqr",
+          phoneNum: 61584220941,
+          emailAddr: "61584220941@163.com",
+          updateTime: "	2022-06-27 09:17:25",
+        },
+      ],
+      /*--------------------------------------------*/
+      // 下拉框 选项
+      agencyList: ["机构1", "机构2", "机构3"],
+      accountStatusList: ["设备1", "设备2", "设备3"],
+      // 筛选栏 绑定的数据
+      queryList: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
+        account: "",
+        agency: "",
+        accountStatus: "",
       },
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
+      // 对话框 绑定的临时数据
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        groupName: "12",
+        agency: "1",
+        describe: "2",
+        equName: "3",
       },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: '设备详情',
-        create: '编辑设备'
+      // 对话框 标题
+      dialogTitleMap: {
+        update: "编辑账户",
+        create: "添加账户",
       },
-      dialogTableVisible: false,
-      pvData: [],
+      // 对话框 属性验证规则
       rules: {
-        groupName: [{ required: true, message: 'groupName is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        groupName: [
+          {
+            required: true,
+            message: "请输入分组名称",
+            trigger: "change",
+          },
+        ],
+        agency: [
+          {
+            required: true,
+            message: "请选择所属机构",
+            trigger: "change",
+          },
+        ],
+        equName: [
+          {
+            required: true,
+            message: "请选择设备",
+            trigger: "change",
+          },
+        ],
       },
-      downloadLoading: false
-    }
+      // 对话框 显示控制标志
+      dialogFormVisible: false,
+      dialogTableVisible: false,
+      // 对话框 相关其他数据
+      dialogStatus: "",
+      updateDataIndex: 0,
+      /*--------------------------------------------*/
+      // 表格 相关其他数据
+      total: 0,
+      tableKey: 0,
+      listLoading: true,
+    };
   },
-  created () {
+  // created 生命周期
+  created() {
     // this.getList()
   },
   methods: {
     // 获得数据
-    getList () { // 404报错处
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+    getList() {
+      this.listLoading = true;
+      // fetchList(this.queryList).then((response) => {
+      //   this.list = response.data.items;
+      //   this.total = response.data.total;
 
-        // 模拟请求的时间
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+      //   // 模拟请求的时间
+      //   setTimeout(() => {
+      //     this.listLoading = false;
+      //   }, 1.5 * 1000);
+      // });
     },
-    // 筛选
-    handleFilter () {
-      this.listQuery.page = 1
+    // 按钮 重置
+    handleReset() {
+      this.queryList = {
+        page: 1,
+        limit: 20,
+        account: "",
+        agency: "",
+        accountStatus: "",
+      };
+    },
+    // 按钮 查询
+    handleFilter() {
+      this.queryList.page = 1;
       // this.getList()
     },
-    handleModifyStatus (row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+    // 按钮 新建分组
+    handleCreate() {
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.$refs["dataForm"].clearValidate();
+      });
     },
-    sortChange (data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID (order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
-    resetTemp () {
+    resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        groupName: "",
+        agency: "",
+        describe: "",
+        equName: "",
+      };
+    },
+    // 按钮 详情
+    handleChangeStatus(row) {
+    },
+    // 按钮 编辑
+    handleUpdate(row, index) {
+      this.updateDataIndex = index;
+      this.temp = Object.assign({}, row); // copy obj
+      // this.temp.timestamp = new Date(this.temp.timestamp);
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.$refs["dataForm"].clearValidate();
+      });
+    },
+    // 按钮 删除
+    handleDelete(index) {
+      this.$notify({
+        title: "删除成功",
+        message: "已删除数据",
+        type: "success",
+        duration: 2000,
+      });
+      this.dataList.splice(index, 1);
+    },
+    // 对话框 按钮 保存
+    createData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          this.temp.groupID = this.getMaxGroupID(this.dataList);
+          this.temp.equNum = this.temp.equName.length;
+          this.dataList.unshift(this.temp); // 在表头添加数据
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "创建成功",
+            message: "创建成功",
+            type: "success",
+            duration: 2000,
+          });
+        }
+      });
+    },
+    updateData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          this.dataList.splice(this.updateDataIndex, 1, this.temp);
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "修改成功",
+            message: "数据修改成功",
+            type: "success",
+            duration: 2000,
+          });
+        }
+      });
+    },
+    getMaxGroupID(dataList) {
+      var max = 0;
+      for (var i = 0; i < dataList.length; i++) {
+        if (dataList[i].groupID > max) max = dataList[i].groupID;
+      }
+      return max + 1;
+    },
+    // 表格 排序功能
+    sortChange(data) {
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
-    // 新增
-    handleCreate () {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData () {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate (row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData () {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex(v => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete (row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
-    },
-    handleMoreInfo () {
-      this.dialogTableVisible = true
-      // fetchPv(pv).then(response => {
-      //   this.pvData = response.data.pvData
-      //   this.dialogTableVisible = true
-      // })
-    },
-    // 导出
-    handleDownload () {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    formatJson (filterVal) {
-      return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+    sortByID(order) {
+      if (order === "ascending") {
+        this.queryList.sort = "+id";
+      } else {
+        this.queryList.sort = "-id";
+      }
+      this.handleFilter();
     },
     getSortClass: function (key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
-    }
-  }
-}
+      const sort = this.queryList.sort;
+      return sort === `+${key}` ? "ascending" : "descending";
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-.my-container {
-  box-shadow: 4px 4px 40px rgba(0, 0, 0, 0.075);
-  padding: 20px 50px;
-  margin: 15px;
-}
-
+@import "@/styles/public-styles.scss";
 .my-icon-button {
   padding: 12px 12px;
 }

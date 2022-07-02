@@ -65,8 +65,8 @@ export const constantRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'List',
+        component: () => import('@/views/material/index'), // Parent router-view
+        name: 'MaterialList',
         meta: { title: '素材列表', icon: 'list' }
       }
     ]
@@ -76,21 +76,35 @@ export const constantRoutes = [
     path: '/program',
     component: Layout,
     redirect: '/program',
-    name: 'Example',
+    name: 'Program',
     meta: { title: '节目制作与发布', icon: 'el-icon-tickets' },
     children: [
       {
         path: 'list',
-        name: 'List',
-        component: () => import('@/views/table/index'),
+        name: 'ProgramList',
+        component: () => import('@/views/program/list'),
         meta: { title: '发布节目', icon: 'el-icon-film' }
       },
       {
         path: 'noticeList',
         name: 'NoticeList',
-        component: () => import('@/views/tree/index'),
+        component: () => import('@/views/program/noticeList/index'),
         meta: { title: '发布公告', icon: 'el-icon-data-board' }
-      }
+      },
+      {
+        path: 'noticeList/new',
+        name: 'New',
+        component: () => import('@/views/program/noticeList/new'),
+        meta: { title: '新建公告' },
+        hidden: true,
+      },
+      {
+        path: 'noticeList/equipment',
+        name: 'Equipment',
+        component: () => import('@/views/program/equipment'),
+        meta: { title: '选择设备' },
+        hidden: true,
+      },
     ]
   },
 
@@ -103,7 +117,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'list',
-        name: 'List',
+        name: 'PlanList',
         component: () => import('@/views/plan/list/index'),
         meta: { title: '计划列表', icon: 'list' },
       },
@@ -111,13 +125,13 @@ export const constantRoutes = [
         path: 'list/new',
         name: 'New',
         component: () => import('@/views/plan/list/new'),
-        meta: { title: '新建计划'},
+        meta: { title: '新建计划' },
         hidden: true,
       },
       {
         path: 'review',
         name: 'Review',
-        component: () => import('@/views/plan/list/new'),
+        component: () => import('@/views/plan/review'),
         meta: { title: '计划审核', icon: 'el-icon-s-claim' }
       },
     ]
@@ -132,13 +146,13 @@ export const constantRoutes = [
     children: [
       {
         path: 'list',
-        name: 'List',
+        name: 'EquipmentList',
         component: () => import('@/views/equipment/list'),
         meta: { title: '设备列表', icon: 'list' }
       },
       {
         path: 'groupList',
-        name: 'GroupList',
+        name: 'EquipmentGroupList',
         component: () => import('@/views/equipment/groupList'),
         meta: { title: '分组管理', icon: 'tree' }
       }

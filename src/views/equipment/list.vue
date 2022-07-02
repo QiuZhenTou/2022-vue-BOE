@@ -200,6 +200,7 @@
           </el-col>
         </el-col>
       </el-row>
+      <!-- 第四行 -->
       <el-row>
         <el-col :span="5" :offset="19">
           <!-- 重置按钮 -->
@@ -229,7 +230,7 @@
       <el-row type="flex" justify="end">
         <el-col :span="14">
           <div class="new-group">
-            <!-- 新建分组按钮 -->
+            <!-- 按钮 批量导入 -->
             <el-button
               v-waves
               class="filter-item"
@@ -239,6 +240,7 @@
             >
               批量导入
             </el-button>
+            <!-- 按钮 模板下载 -->
             <el-button
               v-waves
               class="filter-item"
@@ -247,6 +249,7 @@
             >
               模板下载
             </el-button>
+            <!-- 按钮 批量删除 -->
             <el-button
               v-waves
               class="filter-item"
@@ -255,6 +258,7 @@
             >
               批量删除
             </el-button>
+            <!-- 按钮 批量控制 -->
             <el-button
               v-waves
               class="filter-item"
@@ -263,6 +267,7 @@
             >
               批量控制
             </el-button>
+            <!-- 按钮 数据导出 -->
             <el-button
               v-waves
               class="filter-item"
@@ -286,7 +291,9 @@
       @sort-change="sortChange"
       class="table table-container"
     >
+      <!-- 复选框 -->
       <el-table-column type="selection" width="25px" />
+      <!-- 设备名称 -->
       <el-table-column
         label="设备名称"
         prop="id"
@@ -298,46 +305,56 @@
           <span>{{ row.equName }}</span>
         </template>
       </el-table-column>
+      <!-- 所属机构 -->
       <el-table-column label="所属机构" width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.agency }}</span>
         </template>
       </el-table-column>
+      <!-- 所属分组 -->
       <el-table-column label="所属分组" width="100px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.groupName }}</span>
+          <span>{{ row.group }}</span>
         </template>
       </el-table-column>
+      <!-- MAC地址 -->
       <el-table-column label="MAC地址" width="120px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.macAddress }}</span>
         </template>
       </el-table-column>
+      <!-- 分辨率 -->
       <el-table-column label="分辨率" width="120px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.resolution }}</span>
         </template>
       </el-table-column>
+      <!-- 设备状态 -->
       <el-table-column label="设备状态" width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.equStatus }}</span>
         </template>
       </el-table-column>
+      <!-- 系统升级 -->
       <el-table-column label="系统升级" width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.systemStatus }}</span>
         </template>
       </el-table-column>
+      <!-- 当前计划 -->
       <el-table-column label="当前计划" width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.plan }}</span>
         </template>
       </el-table-column>
+      <!-- 操作 -->
       <el-table-column label="操作" width="350px" align="center">
         <template slot-scope="{ row, $index }">
+          <!-- 详情 -->
           <el-button type="info" size="mini" @click="handleMoreInfo(row)">
             详情
           </el-button>
+          <!-- 控制 -->
           <el-button
             type="primary"
             size="mini"
@@ -346,17 +363,20 @@
           >
             控制
           </el-button>
+          <!-- 刷新 -->
           <el-button type="success" size="mini" @click="handleRefresh()">
             刷新
           </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
+          <!-- 编辑 -->
+          <el-button
+            type="warning"
+            size="mini"
+            @click="handleUpdate(row, $index)"
+          >
             编辑
           </el-button>
-          <el-button
-            type="danger"
-            size="mini"
-            @click="handleDelete(row, $index)"
-          >
+          <!-- 删除 -->
+          <el-button type="danger" size="mini" @click="handleDelete($index)">
             删除
           </el-button>
         </template>
@@ -372,7 +392,7 @@
       @pagination="getList"
     />
 
-    <!-- 对话框 编辑 设备详情 -->
+    <!-- 对话框 编辑 编辑设备 -->
     <el-dialog
       :title="dialogTitleMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
@@ -386,9 +406,14 @@
         label-width="90px"
         style="width: 300px; margin-left: 50px"
       >
-        <el-form-item label="设备名称" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入设备名称" />
-        </el-form-item>
+        <!-- 设备名称 -->
+        <el-form-item label="设备名称" prop="equName">
+          <el-input
+            v-model="temp.equName"
+            placeholder="请输入设备名称"
+          /> </el-form-item
+        >
+        <!-- 所属分组 -->
         <el-form-item label="所属分组" prop="group">
           <el-select
             v-model="temp.group"
@@ -404,6 +429,7 @@
           </el-select>
         </el-form-item>
       </el-form>
+      <!-- 表尾 -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> 取消 </el-button>
         <el-button
@@ -423,6 +449,7 @@
     >
       <template>
         <el-tabs v-model="activeTab" type="card" @tab-click="handleClick">
+          <!-- 设备信息 -->
           <el-tab-pane label="设备信息" name="first">
             <!-- 第一行 -->
             <el-row>
@@ -458,6 +485,7 @@
               </el-col>
             </el-row>
           </el-tab-pane>
+          <!-- 安装信息 -->
           <el-tab-pane label="安装信息" name="second">
             <!-- 第一行 -->
             <el-row>
@@ -478,21 +506,22 @@
               </el-col>
               <el-col :span="12">
                 <el-col :span="6"> 分辨率: </el-col>
-                <el-col :span="18"> {{ dataList }} </el-col>
+                <el-col :span="18"> 1920*1080 </el-col>
               </el-col>
             </el-row>
             <!-- 第三行 -->
             <el-row>
               <el-col :span="12">
-                <el-col :span="6"> 设备名称: </el-col>
-                <el-col :span="18"> test </el-col>
+                <el-col :span="6"> 所属机构: </el-col>
+                <el-col :span="18"> 机构1 </el-col>
               </el-col>
               <el-col :span="12">
-                <el-col :span="6"> 注册时间: </el-col>
-                <el-col :span="18"> 2022-06-27 14:31:14 </el-col>
+                <el-col :span="6"> 屏显方式: </el-col>
+                <el-col :span="18"> 横屏 </el-col>
               </el-col>
             </el-row>
           </el-tab-pane>
+          <!-- 状态信息 -->
           <el-tab-pane label="状态信息" name="third">
             <!-- 第一行 -->
             <el-row>
@@ -508,6 +537,7 @@
           </el-tab-pane>
         </el-tabs>
       </template>
+      <!-- 表尾 -->
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogTableVisible = false"
           >返回</el-button
@@ -535,7 +565,7 @@ export default {
         {
           equName: "设备1",
           agency: "机构1",
-          groupName: "分组1",
+          group: "分组1",
           macAddress: "123-312-213",
           resolution: "1920*1080(横)",
           equStatus: "离线",
@@ -566,39 +596,22 @@ export default {
       },
       // 对话框 绑定的临时数据
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        equName: "",
+        group: "",
       },
       // 对话框 标题
       dialogTitleMap: {
-        update: "设备详情",
-        create: "编辑设备",
+        update: "编辑设备",
         info: "设备详情",
       },
       // 对话框 属性验证规则
       rules: {
-        groupName: [
+        equName: [
           {
             required: true,
-            message: "groupName is required",
+            message: "请输入设备名称",
             trigger: "change",
           },
-        ],
-        timestamp: [
-          {
-            type: "date",
-            required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
-        ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
         ],
       },
       // 对话框 显示控制标志
@@ -607,6 +620,7 @@ export default {
       // 对话框 相关其他数据
       dialogStatus: "",
       activeTab: "first",
+      updateDataIndex: 0,
       /*--------------------------------------------*/
       // 表格 相关其他数据
       total: 0,
@@ -653,20 +667,8 @@ export default {
       this.queryList.page = 1;
       // this.getList()
     },
-    // 按钮 批量导入
-    handleBatchImport() {},
-    // 按钮 模板下载
-    handleDownloadTemplate() {},
-    // 按钮 批量删除
-    handleBatchDelete() {},
-    // 按钮 批量控制
-    handleBatchControl() {},
-    // 按钮 数据导出
-    handleDownloadData() {},
     // 按钮 详情
     handleMoreInfo(row) {
-      console.log("***************************");
-      console.log(this.dataList.equName);
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "info";
@@ -680,9 +682,9 @@ export default {
     // 按钮 刷新
     handleRefresh() {},
     // 按钮 编辑
-    handleUpdate(row) {
+    handleUpdate(row, index) {
+      this.updateDataIndex = index;
       this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -690,14 +692,14 @@ export default {
       });
     },
     // 按钮 删除
-    handleDelete(row, index) {
+    handleDelete(index) {
       this.$notify({
         title: "Success",
         message: "Delete Successfully",
         type: "success",
         duration: 2000,
       });
-      this.list.splice(index, 1);
+      this.dataList.splice(index, 1);
     },
     // 对话框 按钮 保存
     createData() {
@@ -721,18 +723,13 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
-              duration: 2000,
-            });
+          this.dataList.splice(this.updateDataIndex, 1, this.temp);
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "修改成功",
+            message: "数据修改成功",
+            type: "success",
+            duration: 2000,
           });
         }
       });
