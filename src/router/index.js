@@ -65,7 +65,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/views/material/index'), // Parent router-view
+        component: () => import('@/views/material/list/index'), // Parent router-view
         name: 'MaterialList',
         meta: { title: '素材列表', icon: 'list' }
       }
@@ -82,8 +82,15 @@ export const constantRoutes = [
       {
         path: 'list',
         name: 'ProgramList',
-        component: () => import('@/views/program/list'),
+        component: () => import('@/views/program/list/index'),
         meta: { title: '发布节目', icon: 'el-icon-film' }
+      },
+      {
+        path: 'list/new',
+        name: 'New',
+        component: () => import('@/views/program/list/new'),
+        meta: { title: '新建节目' },
+        hidden: true,
       },
       {
         path: 'noticeList',
@@ -101,7 +108,7 @@ export const constantRoutes = [
       {
         path: 'noticeList/equipment',
         name: 'Equipment',
-        component: () => import('@/views/program/equipment'),
+        component: () => import('@/views/program/noticeList/equipment'),
         meta: { title: '选择设备' },
         hidden: true,
       },
@@ -131,7 +138,7 @@ export const constantRoutes = [
       {
         path: 'review',
         name: 'Review',
-        component: () => import('@/views/plan/review'),
+        component: () => import('@/views/plan/review/index'),
         meta: { title: '计划审核', icon: 'el-icon-s-claim' }
       },
     ]
@@ -147,13 +154,13 @@ export const constantRoutes = [
       {
         path: 'list',
         name: 'EquipmentList',
-        component: () => import('@/views/equipment/list'),
+        component: () => import('@/views/equipment/list/index'),
         meta: { title: '设备列表', icon: 'list' }
       },
       {
         path: 'groupList',
         name: 'EquipmentGroupList',
-        component: () => import('@/views/equipment/groupList'),
+        component: () => import('@/views/equipment/groupList/index'),
         meta: { title: '分组管理', icon: 'tree' }
       }
     ]
@@ -170,7 +177,7 @@ export const constantRoutes = [
       {
         path: 'user',
         name: 'User',
-        component: () => import('@/views/system/index'),
+        component: () => import('@/views/system/user/index'),
         meta: { title: '账户管理', icon: 'el-icon-user-solid' }
       }
     ]

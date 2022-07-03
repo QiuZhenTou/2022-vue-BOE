@@ -56,7 +56,7 @@
               class="filter-item"
             >
               <el-option
-                v-for="item in accountStatusList"
+                v-for="item in queryAccountStatusList"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -220,18 +220,18 @@
         label-width="90px"
         style="width: 300px; margin-left: 50px"
       >
-      <!-- 账户名 -->
-        <el-form-item label="账户名" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入账户名" />
+        <!-- 账户名 -->
+        <el-form-item label="账户名" prop="accountName">
+          <el-input v-model="temp.accountName" placeholder="请输入账户名" />
         </el-form-item>
         <!-- 密码 -->
-        <el-form-item label="密码" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入密码" />
+        <el-form-item label="密码" prop="passWord">
+          <el-input v-model="temp.passWord" placeholder="请输入密码" />
         </el-form-item>
         <!-- 所属机构 -->
-        <el-form-item label="所属机构" prop="group">
+        <el-form-item label="所属机构" prop="agency">
           <el-select
-            v-model="temp.group"
+            v-model="temp.agency"
             class="filter-item"
             placeholder="请选择所属机构"
           >
@@ -244,9 +244,9 @@
           </el-select>
         </el-form-item>
         <!-- 所属角色 -->
-        <el-form-item label="所属角色" prop="group">
+        <el-form-item label="所属角色" prop="role">
           <el-select
-            v-model="temp.group"
+            v-model="temp.role"
             class="filter-item"
             placeholder="请选择所属角色"
           >
@@ -259,31 +259,31 @@
           </el-select>
         </el-form-item>
         <!-- 账户状态 -->
-        <el-form-item label="账户状态" prop="group">
+        <el-form-item label="账户状态" prop="accountStatus">
           <el-select
-            v-model="temp.group"
+            v-model="temp.accountStatus"
             class="filter-item"
             placeholder="请选择账户状态"
           >
             <el-option
-              v-for="item in groupList"
-              :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
+              v-for="item in accountStatusList"
+              :key="item"
+              :label="item"
+              :value="item"
             />
           </el-select>
         </el-form-item>
         <!-- 真实姓名 -->
-        <el-form-item label="真实姓名" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入真实姓名" />
+        <el-form-item label="真实姓名" prop="userRealName">
+          <el-input v-model="temp.userRealName" placeholder="请输入真实姓名" />
         </el-form-item>
         <!-- 邮箱 -->
-        <el-form-item label="邮箱" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入邮箱" />
+        <el-form-item label="邮箱" prop="emailAddr">
+          <el-input v-model="temp.emailAddr" placeholder="请输入邮箱" />
         </el-form-item>
         <!-- 手机号 -->
-        <el-form-item label="密码" prop="groupName">
-          <el-input v-model="temp.groupName" placeholder="请输入手机号" />
+        <el-form-item label="手机号" prop="phoneNum">
+          <el-input v-model="temp.phoneNum" placeholder="请输入手机号" />
         </el-form-item>
       </el-form>
       <!-- 表尾 -->
@@ -316,9 +316,12 @@ export default {
       // 表格 显示的数据
       dataList: [
         {
+          // 标记点
           accountName: "test",
+          passWord: "123",
           agency: "机构1",
           role: "无",
+          accountStatus: "启用",
           userRealName: "qqr",
           phoneNum: 61584220941,
           emailAddr: "61584220941@163.com",
@@ -326,8 +329,10 @@ export default {
         },
         {
           accountName: "tester",
+          passWord: "123",
           agency: "机构2",
           role: "无",
+          accountStatus: "启用",
           userRealName: "qqr",
           phoneNum: 61584220941,
           emailAddr: "61584220941@163.com",
@@ -335,8 +340,10 @@ export default {
         },
         {
           accountName: "test-man",
+          passWord: "123",
           agency: "机构3",
           role: "无",
+          accountStatus: "启用",
           userRealName: "qqr",
           phoneNum: 61584220941,
           emailAddr: "61584220941@163.com",
@@ -346,7 +353,8 @@ export default {
       /*--------------------------------------------*/
       // 下拉框 选项
       agencyList: ["机构1", "机构2", "机构3"],
-      accountStatusList: ["设备1", "设备2", "设备3"],
+      queryAccountStatusList: ["所有", "启用", "停用"],
+      accountStatusList: ["启用", "停用"],
       // 筛选栏 绑定的数据
       queryList: {
         page: 1,
@@ -369,6 +377,20 @@ export default {
       },
       // 对话框 属性验证规则
       rules: {
+        accountName: [
+          {
+            required: true,
+            message: "请输入账户名",
+            trigger: "change",
+          },
+        ],
+        passWord: [
+          {
+            required: true,
+            message: "请输入分组名称",
+            trigger: "change",
+          },
+        ],
         groupName: [
           {
             required: true,
@@ -383,10 +405,38 @@ export default {
             trigger: "change",
           },
         ],
-        equName: [
+        role: [
           {
             required: true,
-            message: "请选择设备",
+            message: "请选择所属角色",
+            trigger: "change",
+          },
+        ],
+        accountStatus: [
+          {
+            required: true,
+            message: "请选择账户状态",
+            trigger: "change",
+          },
+        ],
+        userRealName: [
+          {
+            required: true,
+            message: "请输入真实姓名",
+            trigger: "change",
+          },
+        ],
+        emailAddr: [
+          {
+            required: true,
+            message: "请输入邮箱",
+            trigger: "change",
+          },
+        ],
+        phoneNum: [
+          {
+            required: true,
+            message: "请输入手机号",
             trigger: "change",
           },
         ],
@@ -455,8 +505,7 @@ export default {
       };
     },
     // 按钮 详情
-    handleChangeStatus(row) {
-    },
+    handleChangeStatus(row) {},
     // 按钮 编辑
     handleUpdate(row, index) {
       this.updateDataIndex = index;
